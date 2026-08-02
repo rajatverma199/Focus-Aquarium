@@ -1,0 +1,16 @@
+{
+  "name": "focus-aquarium",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.37.1",
+    "vite": "^7.1.12",
+    "wrangler": "^4.92.0"
+  }
+}
