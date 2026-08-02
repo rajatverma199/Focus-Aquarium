@@ -555,7 +555,7 @@ function renderSpecimenCard(reward, minutes) {
   return `
     <article class="specimen-card ${count ? "unlocked" : "locked"}">
       <div class="specimen-visual ${reward.key}">
-        <span class="rarity-tag">${count ? reward.rarity : "Undiscovered"}</span>
+        <span class="rarity-tag">${count ? "Found" : "Undiscovered"}</span>
         ${renderCreature(reward.key)}
         <span class="specimen-count">× ${count}</span>
       </div>
