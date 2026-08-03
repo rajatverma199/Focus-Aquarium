@@ -369,6 +369,7 @@ function renderApp() {
         <div class="nav-actions">
           <a href="#collection">My collection</a>
           ${renderPopoutButton()}
+          ${state.activeSession ? '<button class="topbar-stop" data-action="cancel">Abandon dive</button>' : ""}
         </div>
       </nav>
 
@@ -403,7 +404,7 @@ function renderApp() {
               <button class="primary-action" data-action="start" ${state.activeSession ? "disabled" : ""}>
                 ${state.activeSession ? "Dive in progress" : `Begin ${duration}-minute dive`} <span aria-hidden="true">→</span>
               </button>
-              ${state.activeSession ? '<button class="stop-action" data-action="cancel">End dive</button>' : ""}
+              ${state.activeSession ? '<button class="stop-action" data-action="cancel">Abandon dive</button>' : ""}
               <p data-action-note>${state.activeSession ? task ? `Stay with “${escapeHTML(task)}” while a ${activeReward.rarity.toLowerCase()} find takes shape.` : `Stay with the timer while a ${activeReward.rarity.toLowerCase()} find takes shape.` : `Complete this dive to discover one of ${rewardPool.items.length} ${rewardPool.label.toLowerCase()}.`}</p>
             </div>
           </section>
@@ -658,7 +659,9 @@ function bindEvents() {
   });
 
   app.querySelector('[data-action="start"]')?.addEventListener("click", startFocusSession);
-  app.querySelector('[data-action="cancel"]')?.addEventListener("click", cancelFocusSession);
+  app.querySelectorAll('[data-action="cancel"]').forEach((button) => {
+    button.addEventListener("click", cancelFocusSession);
+  });
   app.querySelector('[data-action="popout"]')?.addEventListener("click", openMiniTimer);
   app.querySelector('[data-action="expand"]')?.addEventListener("click", openFullApp);
 }
