@@ -355,11 +355,17 @@ function renderApp() {
 
   return `
     <main class="site-shell">
-      <nav class="topbar" aria-label="Main navigation">
+      <nav class="topbar ${state.activeSession ? "session-active" : ""}" aria-label="Main navigation">
         <a class="brand" href="#top" aria-label="Focus Aquarium home">
           <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
           <span>Focus Aquarium</span>
         </a>
+        ${state.activeSession ? `
+          <div class="topbar-timer" role="timer" aria-label="Time remaining in focus dive">
+            <span>Time remaining</span>
+            <strong data-live-time>${formatTime(remainingTime)}</strong>
+          </div>
+        ` : ""}
         <div class="nav-actions">
           <a href="#collection">My collection</a>
           ${renderPopoutButton()}
