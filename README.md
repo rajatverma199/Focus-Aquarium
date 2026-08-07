@@ -17,7 +17,7 @@ Focus Aquarium is a calm focus timer that turns completed work sessions into a l
 ## Reward tiers
 
 - **10 minutes — Common finds:** goldfish, miniature koi, and hermit crab
-- **15 minutes — Unique finds:** diver helmet, lost dive boot, and sunken hamster wheel
+- **15 minutes — Unique finds:** diver helmet, lost dive boot, sunken hamster wheel, and ship in a bottle
 - **25 minutes — Rare finds:** moonfin angelfish, parrotfish, regal blue tang, seahorse, lobster, sea turtle, and antlerfish
 
 ## Run locally

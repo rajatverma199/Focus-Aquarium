@@ -53,6 +53,12 @@ const REWARD_POOLS = {
         name: "Sunken Hamster Wheel",
         shortName: "Hamster Wheel",
         description: "No one knows how it got here. The shrimp seem delighted by it."
+      },
+      {
+        key: "ship-bottle",
+        name: "Ship in a Bottle",
+        shortName: "Bottle Ship",
+        description: "A tiny three-masted voyage, sealed in sea glass and somehow still sailing."
       }
     ]
   },
@@ -514,7 +520,7 @@ function renderAmbientFish() {
 
 function renderTankItem(key, index, isActive, progress = 1) {
   const x = 12 + ((index * 23) % 72);
-  const groundItems = new Set(["helmet", "boot", "wheel", "hermit", "lobster"]);
+  const groundItems = new Set(["helmet", "boot", "wheel", "ship-bottle", "hermit", "lobster"]);
   const y = groundItems.has(key) ? 74 + (index % 3) * 3 : 20 + ((index * 17) % 48);
   const delay = -((index * 1.37) % 8);
   return `<div class="tank-item ${key} ${isActive ? "active-find" : ""}" ${isActive ? "data-active-find" : ""} style="--x:${x}%;--y:${y}%;--delay:${delay}s;--reveal:${Math.max(progress, 0.16)}">${renderCreature(key)}</div>`;
@@ -528,6 +534,8 @@ function renderCreature(key) {
       return '<span class="boot-shape"><i></i><i></i></span>';
     case "wheel":
       return '<span class="wheel-shape"><i></i><i></i><i></i><i></i></span>';
+    case "ship-bottle":
+      return '<span class="bottle-shape"><i class="bottle-ship-hull"></i><i class="bottle-ship-mast"></i><i class="bottle-ship-sail"></i></span>';
     case "hermit":
       return '<span class="hermit-shape"><i class="hermit-shell"></i><i class="hermit-body"></i><i class="hermit-eye one"></i><i class="hermit-eye two"></i></span>';
     case "seahorse":

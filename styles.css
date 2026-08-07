@@ -126,10 +126,11 @@ h1 em { color: #68d7de; font-weight: 500; }
 .duration-time small { margin-top: 9px; font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; }
 .duration-rewards { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-content: center; align-items: center; gap: 5px; height: 78px; }
 .duration-reward { position: relative; width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid rgba(151, 221, 226, .14); border-radius: 50%; background: rgba(5, 37, 56, .42); }
-.duration-reward > :is(.fish-shape, .helmet-shape, .boot-shape, .wheel-shape, .hermit-shape, .seahorse-shape, .lobster-shape, .turtle-shape) { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.44); }
+.duration-reward > :is(.fish-shape, .helmet-shape, .boot-shape, .wheel-shape, .bottle-shape, .hermit-shape, .seahorse-shape, .lobster-shape, .turtle-shape) { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.44); }
 .duration-reward > .helmet-shape,
 .duration-reward > .boot-shape,
 .duration-reward > .wheel-shape,
+.duration-reward > .bottle-shape,
 .duration-reward > .hermit-shape,
 .duration-reward > .seahorse-shape,
 .duration-reward > .lobster-shape,
@@ -183,7 +184,7 @@ h1 em { color: #68d7de; font-weight: 500; }
 .tank-item:is(.moonfin, .blue-tang, .antlerfish, .turtle) { width: 92px; animation: fish-swim-reverse 14s ease-in-out infinite; animation-delay: var(--delay); }
 .tank-item:is(.seahorse) { animation: seahorse-float 5s ease-in-out infinite; animation-delay: var(--delay); }
 .tank-item:is(.hermit, .lobster) { animation: seafloor-crawl 9s ease-in-out infinite; animation-delay: var(--delay); }
-.tank-item:is(.helmet, .boot, .wheel, .hermit, .lobster) { width: 58px; height: 65px; transform-origin: bottom; transform: scale(calc(var(--reveal) * .8)); filter: drop-shadow(0 8px 8px rgba(0,19,27,.32)); }
+.tank-item:is(.helmet, .boot, .wheel, .ship-bottle, .hermit, .lobster) { width: 70px; height: 65px; transform-origin: bottom; transform: scale(calc(var(--reveal) * .8)); filter: drop-shadow(0 8px 8px rgba(0,19,27,.32)); }
 .tank-item.ambient-fish { z-index: 3; opacity: .78; filter: saturate(.78) drop-shadow(0 8px 12px rgba(0,20,34,.2)); }
 .tank-item.active-find { opacity: .72; }
 .session-live .tank-item.active-find { filter: drop-shadow(0 0 14px rgba(111,235,231,.68)); }
@@ -228,6 +229,12 @@ h1 em { color: #68d7de; font-weight: 500; }
 .wheel-shape i:nth-child(2) { transform: rotate(45deg); }
 .wheel-shape i:nth-child(3) { transform: rotate(90deg); }
 .wheel-shape i:nth-child(4) { transform: rotate(135deg); }
+.bottle-shape { position: relative; display: block; width: 72px; height: 46px; border: 3px solid rgba(183,229,218,.82); border-radius: 50% 15px 15px 50%; background: linear-gradient(155deg,rgba(230,255,248,.42),rgba(84,164,164,.12) 45%,rgba(216,244,227,.34)); box-shadow: inset 4px 5px rgba(255,255,255,.18),inset -5px -4px rgba(25,94,102,.16); transform: rotate(-5deg); }
+.bottle-shape::before { content: ""; position: absolute; z-index: -1; right: -18px; top: 11px; width: 20px; height: 18px; border: 3px solid rgba(183,229,218,.82); border-left: 0; border-radius: 0 5px 5px 0; background: rgba(175,224,213,.2); }
+.bottle-shape::after { content: ""; position: absolute; right: -25px; top: 12px; width: 9px; height: 16px; border: 2px solid #6d4c31; border-radius: 2px 4px 4px 2px; background: linear-gradient(90deg,#9a6e42,#d1a469); }
+.bottle-ship-hull { position: absolute; z-index: 2; left: 16px; bottom: 8px; width: 35px; height: 10px; background: linear-gradient(#a46a3d,#5d3a29); clip-path: polygon(0 0,100% 0,82% 100%,18% 100%); }
+.bottle-ship-mast { position: absolute; z-index: 2; left: 33px; top: 8px; width: 2px; height: 27px; border-radius: 2px; background: #6c4930; box-shadow: -10px 6px 0 -1px #6c4930,10px 5px 0 -1px #6c4930; }
+.bottle-ship-sail { position: absolute; z-index: 1; left: 35px; top: 10px; width: 15px; height: 17px; background: linear-gradient(145deg,#f4e7c1,#d7c38e); clip-path: polygon(0 0,100% 78%,0 100%); filter: drop-shadow(-12px 3px 0 #e8d6a8); }
 .hermit-shape { position: relative; display: block; width: 68px; height: 46px; }
 .hermit-shell { position: absolute; z-index: 2; left: 4px; top: 2px; width: 40px; height: 38px; border-radius: 52% 48% 52% 44%; background: radial-gradient(circle at 54% 52%,#75513d 0 5px,#e0a464 6px 10px,#9d6548 11px 15px,#d09259 16px); border: 2px solid #644433; }
 .hermit-body { position: absolute; z-index: 3; right: 4px; bottom: 7px; width: 36px; height: 18px; border-radius: 45% 55% 40% 45%; background: #f08d64; }
@@ -300,8 +307,9 @@ h1 em { color: #68d7de; font-weight: 500; }
 .specimen-visual.moonfin { background: linear-gradient(155deg,#cfe9ee,#bfcfe5); }
 .specimen-visual.helmet { background: linear-gradient(155deg,#e7e0bd,#c9d9c9); }
 .specimen-visual > .fish-shape { transform: scale(1.35); filter: drop-shadow(0 18px 15px rgba(28,80,93,.2)); animation: specimen-float 5s ease-in-out infinite; }
-.specimen-visual > :is(.helmet-shape, .boot-shape, .wheel-shape, .hermit-shape, .seahorse-shape, .lobster-shape, .turtle-shape) { transform: scale(1.28) rotate(-4deg); filter: drop-shadow(0 18px 14px rgba(64,73,57,.23)); }
-.specimen-card.locked .specimen-visual > :is(.fish-shape, .helmet-shape, .boot-shape, .wheel-shape, .hermit-shape, .seahorse-shape, .lobster-shape, .turtle-shape) { filter: grayscale(1) opacity(.3); }
+.specimen-visual.ship-bottle { background: linear-gradient(155deg,#d9ece5,#b8d7d2); }
+.specimen-visual > :is(.helmet-shape, .boot-shape, .wheel-shape, .bottle-shape, .hermit-shape, .seahorse-shape, .lobster-shape, .turtle-shape) { transform: scale(1.28) rotate(-4deg); filter: drop-shadow(0 18px 14px rgba(64,73,57,.23)); }
+.specimen-card.locked .specimen-visual > :is(.fish-shape, .helmet-shape, .boot-shape, .wheel-shape, .bottle-shape, .hermit-shape, .seahorse-shape, .lobster-shape, .turtle-shape) { filter: grayscale(1) opacity(.3); }
 .rarity-tag, .specimen-count { position: absolute; z-index: 3; top: 14px; border-radius: 99px; font-family: var(--mono); font-size: .5rem; text-transform: uppercase; letter-spacing: .1em; }
 .rarity-tag { left: 14px; padding: 7px 9px; color: #246b7c; background: rgba(255,255,255,.66); }
 .specimen-count { right: 14px; top: auto; bottom: 14px; color: #2d6574; font-size: .6rem; }
@@ -336,7 +344,7 @@ body[data-view="mini"] { min-width: 480px; overflow: hidden; }
 .mini-card { width: min(100%,620px); display: grid; grid-template-columns: 110px 1fr 88px; gap: 16px; align-items: center; padding: 13px; border: 1px solid rgba(132,218,225,.28); border-radius: 22px; background: rgba(6,48,70,.7); }
 .mini-aquarium { position: relative; height: 105px; display: grid; place-content: center; overflow: hidden; border: 1px solid rgba(142,225,230,.28); border-radius: 15px; background: linear-gradient(#0d7599,#06435e); }
 .mini-aquarium > .fish-shape { transform: scale(.8); }
-.mini-aquarium > :is(.helmet-shape, .boot-shape, .wheel-shape, .hermit-shape, .seahorse-shape, .lobster-shape, .turtle-shape) { transform: scale(.8); }
+.mini-aquarium > :is(.helmet-shape, .boot-shape, .wheel-shape, .bottle-shape, .hermit-shape, .seahorse-shape, .lobster-shape, .turtle-shape) { transform: scale(.8); }
 .mini-bubbles i { position: absolute; bottom: -10px; width: 5px; height: 5px; border: 1px solid rgba(223,249,246,.6); border-radius: 50%; animation: bubble-rise 3s linear infinite; }
 .mini-bubbles i:nth-child(1) { left: 20%; }
 .mini-bubbles i:nth-child(2) { left: 65%; animation-delay: -1s; }
