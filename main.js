@@ -525,11 +525,13 @@ function renderAmbientFish() {
 }
 
 function renderTankItem(key, index, isActive, progress = 1) {
-  const x = 12 + ((index * 23) % 72);
   const groundItems = new Set(["helmet", "boot", "wheel", "ship-bottle", "hermit", "cherry-shrimp", "lobster"]);
+  const scuttlingItems = new Set(["hermit", "cherry-shrimp"]);
+  const x = scuttlingItems.has(key) ? 14 + ((index * 19) % 50) : 12 + ((index * 23) % 72);
   const y = groundItems.has(key) ? 74 + (index % 3) * 3 : 20 + ((index * 17) % 48);
   const delay = -((index * 1.37) % 8);
-  return `<div class="tank-item ${key} ${isActive ? "active-find" : ""}" ${isActive ? "data-active-find" : ""} style="--x:${x}%;--y:${y}%;--delay:${delay}s;--reveal:${Math.max(progress, 0.16)}">${renderCreature(key)}</div>`;
+  const floorLevel = scuttlingItems.has(key) ? `--floor-level:${(index % 3) * 4}px;` : "";
+  return `<div class="tank-item ${key} ${isActive ? "active-find" : ""}" ${isActive ? "data-active-find" : ""} style="--x:${x}%;--y:${y}%;--delay:${delay}s;--reveal:${Math.max(progress, 0.16)};${floorLevel}">${renderCreature(key)}</div>`;
 }
 
 function renderCreature(key) {
@@ -543,9 +545,9 @@ function renderCreature(key) {
     case "ship-bottle":
       return '<span class="bottle-shape"><i class="bottle-ship-hull"></i><i class="bottle-ship-mast"></i><i class="bottle-ship-sail"></i></span>';
     case "hermit":
-      return '<span class="hermit-shape"><i class="hermit-shell"></i><i class="hermit-body"></i><i class="hermit-eye one"></i><i class="hermit-eye two"></i></span>';
+      return '<span class="hermit-shape"><i class="hermit-shell"></i><i class="hermit-body"></i><span class="hermit-legs" aria-hidden="true"><i></i><i></i><i></i><i></i></span><i class="hermit-eye one"></i><i class="hermit-eye two"></i></span>';
     case "cherry-shrimp":
-      return '<span class="shrimp-shape"><i class="shrimp-body"></i><i class="shrimp-tail"></i><i class="shrimp-legs"></i><i class="shrimp-eye"></i></span>';
+      return '<span class="shrimp-shape"><i class="shrimp-body"></i><i class="shrimp-tail"></i><span class="shrimp-legs" aria-hidden="true"><i></i><i></i><i></i><i></i></span><i class="shrimp-eye"></i></span>';
     case "seahorse":
       return '<span class="seahorse-shape"><i class="seahorse-head"></i><i class="seahorse-body"></i><i class="seahorse-tail"></i><i class="seahorse-eye"></i></span>';
     case "lobster":
