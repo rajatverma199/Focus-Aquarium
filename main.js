@@ -128,14 +128,31 @@ const ALL_REWARDS = Object.entries(REWARD_POOLS).flatMap(([duration, pool]) =>
 );
 
 const GROUND_REWARD_KEYS = new Set(["helmet", "boot", "wheel", "ship-bottle", "hermit", "cherry-shrimp", "lobster"]);
-const SCUTTLING_REWARD_KEYS = new Set(["hermit", "cherry-shrimp"]);
 const ANIMAL_REWARD_KEYS = new Set(["goldfish", "koi", "hermit", "cherry-shrimp", "moonfin", "parrotfish", "blue-tang", "seahorse", "lobster", "turtle", "antlerfish"]);
-const AQUARIUM_SWIM_SLOTS = [
-  { x: 8, y: 16 }, { x: 39, y: 18 }, { x: 70, y: 15 },
-  { x: 8, y: 32 }, { x: 39, y: 34 }, { x: 70, y: 31 },
-  { x: 8, y: 48 }, { x: 39, y: 50 }, { x: 70, y: 47 },
-  { x: 8, y: 64 }, { x: 39, y: 62 }, { x: 70, y: 63 }
-];
+const AQUARIUM_SCALE = {
+  goldfish: 0.92,
+  koi: 0.94,
+  hermit: 0.94,
+  "cherry-shrimp": 0.62,
+  moonfin: 1,
+  parrotfish: 0.96,
+  "blue-tang": 1,
+  seahorse: 0.86,
+  lobster: 1,
+  turtle: 1.42,
+  antlerfish: 1
+};
+
+const AQUARIUM_FOOTPRINT = {
+  seahorse: { width: 5.5, height: 14 },
+  turtle: { width: 10, height: 10.5 },
+  moonfin: { width: 9, height: 9 },
+  "blue-tang": { width: 9, height: 9 },
+  antlerfish: { width: 9, height: 9 },
+  hermit: { width: 7, height: 9 },
+  "cherry-shrimp": { width: 7, height: 7 },
+  lobster: { width: 7.5, height: 9 }
+};
 
 const FOCUS_NOTES = [
   ["Let the surface settle", "The first few minutes are for quieting mental ripples. Keep one task in view and let everything else drift past."],
@@ -506,15 +523,14 @@ function renderAquarium(activeReward, progress) {
   const displayItems = state.collection.slice(-7);
   const activeKey = activeReward?.key || null;
   const residents = [
-    { key: "goldfish", ambient: true, reveal: 0.76, delay: -1.4 },
-    { key: "goldfish", ambient: true, reveal: 0.58, delay: -5.2 },
-    { key: "koi", ambient: true, reveal: 0.66, delay: -8.1 },
-    ...displayItems.map((item) => ({ key: item.rewardKey })),
-    ...(activeKey ? [{ key: activeKey, isActive: true, reveal: Math.max(progress, 0.16) }] : [])
+    { id: "ambient-goldfish-one", key: "goldfish", ambient: true, reveal: 0.76, delay: -1.4, x: 13, y: 28 },
+    { id: "ambient-goldfish-two", key: "goldfish", ambient: true, reveal: 0.58, delay: -5.2, x: 61, y: 19 },
+    { id: "ambient-koi", key: "koi", ambient: true, reveal: 0.66, delay: -8.1, x: 34, y: 57 },
+    ...displayItems.map((item) => ({ id: item.id, key: item.rewardKey })),
+    ...(activeKey ? [{ id: state.activeSession?.id || `active-${activeKey}`, key: activeKey, isActive: true, reveal: Math.max(progress, 0.16) }] : [])
   ];
-  const densityClass = residents.length >= 9 ? "aquarium-packed" : residents.length >= 4 ? "aquarium-crowded" : "";
   return `
-    <div class="tank-water ${densityClass}" data-resident-count="${residents.length}">
+    <div class="tank-water" data-resident-count="${residents.length}">
       <div class="water-surface"><i></i><i></i></div>
       <div class="light-rays"></div>
       <div class="bubble-field" aria-hidden="true">
@@ -529,56 +545,111 @@ function renderAquarium(activeReward, progress) {
 }
 
 function renderTankResidents(residents) {
-  const groundCount = residents.filter((resident) => GROUND_REWARD_KEYS.has(resident.key)).length;
-  const swimmingCount = residents.length - groundCount;
-  const groundTravel = Math.max(0, Math.min(18, 30 - groundCount * 4));
-  const swimTravel = Math.max(4, Math.min(18, 24 - swimmingCount * 2));
-  let groundIndex = 0;
-  let swimmingIndex = 0;
+  const occupied = [];
 
   return residents.map((resident, index) => {
     const isGrounded = GROUND_REWARD_KEYS.has(resident.key);
-    let x;
-    let y;
-    let floorLevel = 0;
-
-    if (isGrounded) {
-      const groundStart = groundCount <= 3 ? 14 : 7;
-      const groundEnd = groundCount <= 3 ? 72 : 83;
-      x = groundCount === 1 ? 46 : groundStart + (groundIndex * (groundEnd - groundStart)) / (groundCount - 1);
-      floorLevel = (groundIndex % 2) * 3;
-      groundIndex += 1;
-    } else {
-      const slot = AQUARIUM_SWIM_SLOTS[swimmingIndex % AQUARIUM_SWIM_SLOTS.length];
-      x = slot.x;
-      y = slot.y;
-      swimmingIndex += 1;
-    }
+    const speciesScale = AQUARIUM_SCALE[resident.key] ?? 1;
+    const placement = findOrganicTankPosition(resident, occupied, speciesScale);
+    const motionRandom = createSeededRandom(hashString(`${resident.id || resident.key}-${index}-motion`));
+    const crawlLeft = -(12 + Math.round(motionRandom() * 14));
+    const crawlRight = 16 + Math.round(motionRandom() * 24);
+    const swimLeft = -(12 + Math.round(motionRandom() * 20));
+    const swimRight = 18 + Math.round(motionRandom() * 28);
+    const swimRise = -(7 + Math.round(motionRandom() * 11));
+    const swimDip = 6 + Math.round(motionRandom() * 10);
 
     const delay = resident.delay ?? -((index * 1.37) % 8);
     const classes = [
       "tank-item",
       resident.key,
       ANIMAL_REWARD_KEYS.has(resident.key) ? "tank-animal" : "tank-object",
+      isGrounded ? "tank-ground" : "",
       resident.ambient ? "ambient-fish" : "",
       resident.isActive ? "active-find" : ""
     ].filter(Boolean).join(" ");
     const style = [
-      `--x:${x}%`,
-      y == null ? "" : `--y:${y}%`,
+      `--x:${placement.x}%`,
+      placement.y == null ? "" : `--y:${placement.y}%`,
       `--delay:${delay}s`,
       `--reveal:${resident.reveal ?? 1}`,
-      `--floor-level:${floorLevel}px`,
-      `--crawl-left:${-groundTravel}px`,
-      `--crawl-right:${groundTravel}px`,
-      `--swim-left:${-swimTravel}px`,
-      `--swim-right:${swimTravel}px`,
-      `--swim-rise:${-Math.max(4, Math.round(swimTravel * 0.4))}px`,
-      `--swim-dip:${Math.max(3, Math.round(swimTravel * 0.3))}px`
+      `--species-scale:${speciesScale}`,
+      `--floor-level:${placement.floorLevel}px`,
+      `--crawl-left:${crawlLeft}px`,
+      `--crawl-right:${crawlRight}px`,
+      `--swim-left:${swimLeft}px`,
+      `--swim-right:${swimRight}px`,
+      `--swim-rise:${swimRise}px`,
+      `--swim-dip:${swimDip}px`
     ].filter(Boolean).join(";");
 
     return `<div class="${classes}" ${resident.isActive ? "data-active-find" : ""} style="${style}">${renderCreature(resident.key)}</div>`;
   }).join("");
+}
+
+function findOrganicTankPosition(resident, occupied, speciesScale) {
+  const isGrounded = GROUND_REWARD_KEYS.has(resident.key);
+  const random = createSeededRandom(hashString(`${resident.id || resident.key}-placement`));
+  const baseFootprint = AQUARIUM_FOOTPRINT[resident.key] || { width: 8, height: 9 };
+  const displayScale = speciesScale * (resident.ambient ? resident.reveal ?? 1 : 1) * (isGrounded && resident.key !== "cherry-shrimp" ? 0.8 : 1);
+  const width = baseFootprint.width * displayScale;
+  const height = baseFootprint.height * displayScale;
+  const preferredPosition = resident.x != null
+    ? { x: resident.x, y: resident.y, floorLevel: 0 }
+    : null;
+  let bestCandidate = null;
+  let bestClearance = -Infinity;
+
+  for (let attempt = 0; attempt < 120; attempt += 1) {
+    const candidate = attempt === 0 && preferredPosition
+      ? preferredPosition
+      : isGrounded
+        ? { x: 7 + width / 2 + random() * (86 - width), y: null, floorLevel: Math.round(random() * 4) }
+        : { x: 6 + width / 2 + random() * (88 - width), y: 13 + height / 2 + random() * (60 - height), floorLevel: 0 };
+    const centerY = isGrounded ? 86 - height / 2 : candidate.y;
+    const box = {
+      left: candidate.x - width / 2 - 1.4,
+      right: candidate.x + width / 2 + 1.4,
+      top: centerY - height / 2 - 1.4,
+      bottom: centerY + height / 2 + 1.4
+    };
+    const clearance = occupied.reduce((closest, item) => {
+      const horizontalGap = Math.max(item.left - box.right, box.left - item.right);
+      const verticalGap = Math.max(item.top - box.bottom, box.top - item.bottom);
+      return Math.min(closest, Math.max(horizontalGap, verticalGap));
+    }, Infinity);
+
+    if (clearance >= 0) {
+      occupied.push(box);
+      return candidate;
+    }
+    if (clearance > bestClearance) {
+      bestCandidate = { candidate, box };
+      bestClearance = clearance;
+    }
+  }
+
+  occupied.push(bestCandidate.box);
+  return bestCandidate.candidate;
+}
+
+function hashString(value) {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function createSeededRandom(seed) {
+  return () => {
+    seed += 0x6D2B79F5;
+    let value = seed;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 function renderCreature(key) {

@@ -180,15 +180,15 @@ h1 em { color: #68d7de; font-weight: 500; }
 .empty-tank-message span { font-size: 2rem; animation: pulse 3s infinite; }
 .empty-tank-message strong { font-family: var(--serif); font-size: 1.16rem; font-weight: 500; line-height: 1.1; }
 
-.tank-item { position: absolute; z-index: 4; left: var(--x); top: var(--y); width: 76px; height: 50px; scale: calc(var(--reveal) * var(--layout-scale, 1)); filter: drop-shadow(0 8px 12px rgba(0,20,34,.28)); }
+.tank-item { position: absolute; z-index: 4; left: calc(var(--x) - 38px); top: var(--y); width: 76px; height: 50px; scale: calc(var(--reveal) * var(--species-scale, 1)); filter: drop-shadow(0 8px 12px rgba(0,20,34,.28)); }
 .tank-item:is(.goldfish, .koi, .parrotfish) { animation: fish-swim 11s ease-in-out infinite; animation-delay: var(--delay); }
-.tank-item:is(.moonfin, .blue-tang, .antlerfish, .turtle) { width: 92px; animation: fish-swim-reverse 14s ease-in-out infinite; animation-delay: var(--delay); }
+.tank-item:is(.moonfin, .blue-tang, .antlerfish, .turtle) { left: calc(var(--x) - 46px); width: 92px; animation: fish-swim-reverse 14s ease-in-out infinite; animation-delay: var(--delay); }
 .tank-item:is(.seahorse) { animation: seahorse-float 5s ease-in-out infinite; animation-delay: var(--delay); }
 .tank-item.lobster { animation: seafloor-crawl 9s ease-in-out infinite; animation-delay: var(--delay); }
-.tank-item:is(.hermit, .cherry-shrimp) { top: auto; bottom: calc(45px + var(--floor-level, 0px)); }
+.tank-item.tank-ground { top: auto; bottom: calc(45px + var(--floor-level, 0px)); }
 .tank-item.hermit { animation: hermit-scuttle 11.5s linear infinite; animation-delay: var(--delay); }
 .tank-item.cherry-shrimp { animation: shrimp-scuttle 7.2s linear infinite; animation-delay: var(--delay); }
-.tank-item:is(.helmet, .boot, .wheel, .ship-bottle, .hermit, .lobster) { width: 70px; height: 65px; transform-origin: bottom; scale: calc(var(--reveal) * var(--layout-scale, 1) * .8); filter: drop-shadow(0 8px 8px rgba(0,19,27,.32)); }
+.tank-item:is(.helmet, .boot, .wheel, .ship-bottle, .hermit, .lobster) { left: calc(var(--x) - 35px); width: 70px; height: 65px; transform-origin: bottom; scale: calc(var(--reveal) * var(--species-scale, 1) * .8); filter: drop-shadow(0 8px 8px rgba(0,19,27,.32)); }
 .tank-item.ambient-fish { z-index: 3; opacity: .78; filter: saturate(.78) drop-shadow(0 8px 12px rgba(0,20,34,.2)); }
 .tank-item.active-find { opacity: .72; }
 .session-live .tank-item.active-find { filter: drop-shadow(0 0 14px rgba(111,235,231,.68)); }
@@ -500,8 +500,6 @@ body[data-view="mini"] { min-width: 480px; overflow: hidden; }
   .focus-action-row { grid-template-columns: 1fr; }
   .primary-action, .stop-action { width: 100%; }
   .tank-water { height: 410px; }
-  .tank-water.aquarium-crowded .tank-item { --layout-scale: .76; }
-  .tank-water.aquarium-packed .tank-item { --layout-scale: .62; }
   .aquarium-frame { border-radius: 28px; }
   .timer-dock { grid-template-columns: 1fr; }
   .timer-dock .progress-wrap, .timer-dock small { grid-column: 1; }
