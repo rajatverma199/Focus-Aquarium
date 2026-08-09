@@ -286,10 +286,14 @@ h1 em { color: #68d7de; font-weight: 500; }
 .turtle-head { position: absolute; z-index: 2; right: 1px; top: 17px; width: 23px; height: 18px; border-radius: 44% 58% 52% 45%; background: #64ad7e; }
 .turtle-head::after { content: ""; position: absolute; right: 5px; top: 5px; width: 4px; height: 4px; border-radius: 50%; background: #173c48; }
 .turtle-flipper { position: absolute; z-index: 2; width: 25px; height: 13px; border-radius: 70% 25% 70% 25%; background: #51966f; }
-.turtle-flipper.one { left: 12px; top: 2px; transform: rotate(-32deg); }
-.turtle-flipper.two { left: 14px; bottom: 1px; transform: rotate(28deg); }
-.turtle-flipper.three { right: 11px; top: 4px; transform: rotate(26deg); }
-.turtle-flipper.four { right: 11px; bottom: 2px; transform: rotate(-28deg); }
+.turtle-flipper.one,
+.turtle-flipper.two { width: 18px; height: 10px; transform-origin: 85% 50%; }
+.turtle-flipper.three,
+.turtle-flipper.four { width: 28px; height: 13px; transform-origin: 15% 50%; }
+.turtle-flipper.one { left: 11px; top: 5px; transform: rotate(-32deg); }
+.turtle-flipper.two { left: 12px; bottom: 4px; transform: rotate(28deg); }
+.turtle-flipper.three { right: 8px; top: 3px; transform: rotate(26deg); }
+.turtle-flipper.four { right: 8px; bottom: 1px; transform: rotate(-28deg); }
 
 .timer-dock { padding: 19px 18px 12px; display: grid; grid-template-columns: auto 1fr; gap: 8px 20px; align-items: end; }
 .timer-dock > div:first-child { display: grid; }
@@ -421,6 +425,28 @@ body[data-view="mini"] { min-width: 480px; overflow: hidden; }
 }
 @keyframes hermit-leg-step { from { transform: rotate(48deg) translateY(-1px); } to { transform: rotate(8deg) translateY(1px); } }
 @keyframes shrimp-leg-step { from { transform: rotate(55deg) translateY(-1px); } to { transform: rotate(4deg) translateY(1px); } }
+@keyframes turtle-foreflipper-top {
+  0%,100% { transform: rotate(7deg) scaleY(.48); }
+  18% { transform: rotate(17deg) scaleY(.78); }
+  58% { transform: rotate(49deg) scaleY(1.06); }
+  74% { transform: rotate(39deg) scaleY(.72); }
+}
+@keyframes turtle-foreflipper-bottom {
+  0%,100% { transform: rotate(-7deg) scaleY(.48); }
+  18% { transform: rotate(-17deg) scaleY(.78); }
+  58% { transform: rotate(-49deg) scaleY(1.06); }
+  74% { transform: rotate(-39deg) scaleY(.72); }
+}
+@keyframes turtle-rudder-top {
+  0%,100% { transform: rotate(-34deg) translateX(0); }
+  45% { transform: rotate(-27deg) translateX(1px); }
+  72% { transform: rotate(-38deg) translateX(-1px); }
+}
+@keyframes turtle-rudder-bottom {
+  0%,100% { transform: rotate(31deg) translateX(0); }
+  45% { transform: rotate(37deg) translateX(-1px); }
+  72% { transform: rotate(25deg) translateX(1px); }
+}
 @keyframes tail-wave { to { transform: scaleX(.7); } }
 @keyframes pulse { 50% { opacity: .35; transform: scale(.85); } }
 @keyframes specimen-float { 50% { transform: scale(1.35) translateY(-7px) rotate(1deg); } }
@@ -431,6 +457,10 @@ body[data-view="mini"] { min-width: 480px; overflow: hidden; }
 .tank-item.cherry-shrimp .shrimp-legs i { animation: shrimp-leg-step .16s ease-in-out infinite alternate; }
 .tank-item.hermit .hermit-legs i:nth-child(even) { animation-direction: alternate-reverse; }
 .tank-item.cherry-shrimp .shrimp-legs i:nth-child(even) { animation-direction: alternate-reverse; }
+.tank-item.turtle .turtle-flipper.three { animation: turtle-foreflipper-top 1.9s cubic-bezier(.45, 0, .25, 1) infinite; animation-delay: var(--delay); }
+.tank-item.turtle .turtle-flipper.four { animation: turtle-foreflipper-bottom 1.9s cubic-bezier(.45, 0, .25, 1) infinite; animation-delay: var(--delay); }
+.tank-item.turtle .turtle-flipper.one { animation: turtle-rudder-top 3.8s ease-in-out infinite; animation-delay: var(--delay); }
+.tank-item.turtle .turtle-flipper.two { animation: turtle-rudder-bottom 3.8s ease-in-out infinite; animation-delay: var(--delay); }
 
 @media (max-width: 980px) {
   .hero { grid-template-columns: 1fr; padding-top: 55px; }
