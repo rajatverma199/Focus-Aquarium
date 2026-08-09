@@ -129,6 +129,7 @@ const ALL_REWARDS = Object.entries(REWARD_POOLS).flatMap(([duration, pool]) =>
 
 const GROUND_REWARD_KEYS = new Set(["helmet", "boot", "wheel", "ship-bottle", "hermit", "cherry-shrimp", "lobster"]);
 const ANIMAL_REWARD_KEYS = new Set(["goldfish", "koi", "hermit", "cherry-shrimp", "moonfin", "parrotfish", "blue-tang", "seahorse", "lobster", "turtle", "antlerfish"]);
+const AQUARIUM_BASE_CAPACITY = 7;
 const AQUARIUM_SCALE = {
   goldfish: 0.92,
   koi: 0.94,
@@ -520,7 +521,7 @@ function renderDurationOption(minutes) {
 }
 
 function renderAquarium(activeReward, progress) {
-  const displayItems = state.collection.slice(-7);
+  const displayItems = getAquariumCollectionItems();
   const activeKey = activeReward?.key || null;
   const residents = [
     { id: "ambient-goldfish-one", key: "goldfish", ambient: true, reveal: 0.76, delay: -1.4, x: 13, y: 28 },
@@ -542,6 +543,25 @@ function renderAquarium(activeReward, progress) {
       ${renderTankResidents(residents)}
     </div>
   `;
+}
+
+function getAquariumCollectionItems() {
+  const uniqueItems = [];
+  const duplicateItems = [];
+  const representedRewards = new Set();
+
+  state.collection.forEach((item) => {
+    if (!representedRewards.has(item.rewardKey)) {
+      representedRewards.add(item.rewardKey);
+      uniqueItems.push(item);
+      return;
+    }
+    duplicateItems.push(item);
+  });
+
+  const duplicateCapacity = Math.max(0, AQUARIUM_BASE_CAPACITY - uniqueItems.length);
+  const recentDuplicates = duplicateCapacity > 0 ? duplicateItems.slice(-duplicateCapacity) : [];
+  return [...uniqueItems, ...recentDuplicates];
 }
 
 function renderTankResidents(residents) {
