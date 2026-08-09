@@ -180,7 +180,7 @@ h1 em { color: #68d7de; font-weight: 500; }
 .empty-tank-message span { font-size: 2rem; animation: pulse 3s infinite; }
 .empty-tank-message strong { font-family: var(--serif); font-size: 1.16rem; font-weight: 500; line-height: 1.1; }
 
-.tank-item { position: absolute; z-index: 4; left: var(--x); top: var(--y); width: 76px; height: 50px; transform: scale(var(--reveal)); filter: drop-shadow(0 8px 12px rgba(0,20,34,.28)); }
+.tank-item { position: absolute; z-index: 4; left: var(--x); top: var(--y); width: 76px; height: 50px; scale: calc(var(--reveal) * var(--layout-scale, 1)); filter: drop-shadow(0 8px 12px rgba(0,20,34,.28)); }
 .tank-item:is(.goldfish, .koi, .parrotfish) { animation: fish-swim 11s ease-in-out infinite; animation-delay: var(--delay); }
 .tank-item:is(.moonfin, .blue-tang, .antlerfish, .turtle) { width: 92px; animation: fish-swim-reverse 14s ease-in-out infinite; animation-delay: var(--delay); }
 .tank-item:is(.seahorse) { animation: seahorse-float 5s ease-in-out infinite; animation-delay: var(--delay); }
@@ -188,7 +188,7 @@ h1 em { color: #68d7de; font-weight: 500; }
 .tank-item:is(.hermit, .cherry-shrimp) { top: auto; bottom: calc(45px + var(--floor-level, 0px)); }
 .tank-item.hermit { animation: hermit-scuttle 11.5s linear infinite; animation-delay: var(--delay); }
 .tank-item.cherry-shrimp { animation: shrimp-scuttle 7.2s linear infinite; animation-delay: var(--delay); }
-.tank-item:is(.helmet, .boot, .wheel, .ship-bottle, .hermit, .lobster) { width: 70px; height: 65px; transform-origin: bottom; transform: scale(calc(var(--reveal) * .8)); filter: drop-shadow(0 8px 8px rgba(0,19,27,.32)); }
+.tank-item:is(.helmet, .boot, .wheel, .ship-bottle, .hermit, .lobster) { width: 70px; height: 65px; transform-origin: bottom; scale: calc(var(--reveal) * var(--layout-scale, 1) * .8); filter: drop-shadow(0 8px 8px rgba(0,19,27,.32)); }
 .tank-item.ambient-fish { z-index: 3; opacity: .78; filter: saturate(.78) drop-shadow(0 8px 12px rgba(0,20,34,.2)); }
 .tank-item.active-find { opacity: .72; }
 .session-live .tank-item.active-find { filter: drop-shadow(0 0 14px rgba(111,235,231,.68)); }
@@ -386,24 +386,24 @@ body[data-view="mini"] { min-width: 480px; overflow: hidden; }
 @keyframes surface { 0%,100% { transform: translateX(-4%) rotate(-1deg); } 50% { transform: translateX(7%) rotate(1deg); } }
 @keyframes rays { to { opacity: .38; transform: translateX(4%); } }
 @keyframes plant-sway { to { translate: 7px 0; rotate: 5deg; } }
-@keyframes fish-swim { 0%,100% { translate: -12px 0; } 45% { translate: 36px -14px; } 50% { transform: scaleX(1); } 51% { transform: scaleX(-1); } 94% { translate: -18px 12px; transform: scaleX(-1); } 95% { transform: scaleX(1); } }
-@keyframes fish-swim-reverse { 0%,100% { translate: 24px 0; transform: scaleX(-1); } 47% { translate: -32px 15px; transform: scaleX(-1); } 48% { transform: scaleX(1); } 95% { translate: 28px -10px; transform: scaleX(1); } 96% { transform: scaleX(-1); } }
+@keyframes fish-swim { 0%,100% { translate: var(--swim-left, -12px) 0; } 45% { translate: var(--swim-right, 36px) var(--swim-rise, -14px); } 50% { transform: scaleX(1); } 51% { transform: scaleX(-1); } 94% { translate: var(--swim-left, -18px) var(--swim-dip, 12px); transform: scaleX(-1); } 95% { transform: scaleX(1); } }
+@keyframes fish-swim-reverse { 0%,100% { translate: var(--swim-right, 24px) 0; transform: scaleX(-1); } 47% { translate: var(--swim-left, -32px) var(--swim-dip, 15px); transform: scaleX(-1); } 48% { transform: scaleX(1); } 95% { translate: var(--swim-right, 28px) var(--swim-rise, -10px); transform: scaleX(1); } 96% { transform: scaleX(-1); } }
 @keyframes seahorse-float { 0%,100% { translate: 0 -6px; rotate: -3deg; } 50% { translate: 8px 8px; rotate: 3deg; } }
 @keyframes seafloor-crawl { 0%,100% { translate: -8px 0; } 50% { translate: 13px -2px; } }
 @keyframes hermit-scuttle {
-  0%,7% { translate: -12px 0; }
-  28%,39% { translate: 30px 0; }
-  41% { translate: 29px 0; }
-  70%,82% { translate: -18px 0; }
-  84% { translate: -17px 0; }
-  100% { translate: -12px 0; }
+  0%,7% { translate: var(--crawl-left, -12px) 0; }
+  28%,39% { translate: var(--crawl-right, 30px) 0; }
+  41% { translate: var(--crawl-right, 29px) 0; }
+  70%,82% { translate: var(--crawl-left, -18px) 0; }
+  84% { translate: var(--crawl-left, -17px) 0; }
+  100% { translate: var(--crawl-left, -12px) 0; }
 }
 @keyframes shrimp-scuttle {
-  0%,9% { translate: -15px 0; }
-  27%,35% { translate: 22px 0; }
-  48%,56% { translate: 7px 0; }
-  78%,87% { translate: -20px 0; }
-  100% { translate: -15px 0; }
+  0%,9% { translate: var(--crawl-left, -15px) 0; }
+  27%,35% { translate: var(--crawl-right, 22px) 0; }
+  48%,56% { translate: 0 0; }
+  78%,87% { translate: var(--crawl-left, -20px) 0; }
+  100% { translate: var(--crawl-left, -15px) 0; }
 }
 @keyframes hermit-turn {
   0%,39% { transform: scaleX(1) translateY(0) rotate(0); }
@@ -470,6 +470,8 @@ body[data-view="mini"] { min-width: 480px; overflow: hidden; }
   .focus-action-row { grid-template-columns: 1fr; }
   .primary-action, .stop-action { width: 100%; }
   .tank-water { height: 410px; }
+  .tank-water.aquarium-crowded .tank-item { --layout-scale: .76; }
+  .tank-water.aquarium-packed .tank-item { --layout-scale: .62; }
   .aquarium-frame { border-radius: 28px; }
   .timer-dock { grid-template-columns: 1fr; }
   .timer-dock .progress-wrap, .timer-dock small { grid-column: 1; }

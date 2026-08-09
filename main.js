@@ -127,6 +127,16 @@ const ALL_REWARDS = Object.entries(REWARD_POOLS).flatMap(([duration, pool]) =>
   }))
 );
 
+const GROUND_REWARD_KEYS = new Set(["helmet", "boot", "wheel", "ship-bottle", "hermit", "cherry-shrimp", "lobster"]);
+const SCUTTLING_REWARD_KEYS = new Set(["hermit", "cherry-shrimp"]);
+const ANIMAL_REWARD_KEYS = new Set(["goldfish", "koi", "hermit", "cherry-shrimp", "moonfin", "parrotfish", "blue-tang", "seahorse", "lobster", "turtle", "antlerfish"]);
+const AQUARIUM_SWIM_SLOTS = [
+  { x: 8, y: 16 }, { x: 39, y: 18 }, { x: 70, y: 15 },
+  { x: 8, y: 32 }, { x: 39, y: 34 }, { x: 70, y: 31 },
+  { x: 8, y: 48 }, { x: 39, y: 50 }, { x: 70, y: 47 },
+  { x: 8, y: 64 }, { x: 39, y: 62 }, { x: 70, y: 63 }
+];
+
 const FOCUS_NOTES = [
   ["Let the surface settle", "The first few minutes are for quieting mental ripples. Keep one task in view and let everything else drift past."],
   ["Stay below the noise", "Every avoided switch preserves the context already in your head. That continuity is where deeper work begins."],
@@ -495,8 +505,16 @@ function renderDurationOption(minutes) {
 function renderAquarium(activeReward, progress) {
   const displayItems = state.collection.slice(-7);
   const activeKey = activeReward?.key || null;
+  const residents = [
+    { key: "goldfish", ambient: true, reveal: 0.76, delay: -1.4 },
+    { key: "goldfish", ambient: true, reveal: 0.58, delay: -5.2 },
+    { key: "koi", ambient: true, reveal: 0.66, delay: -8.1 },
+    ...displayItems.map((item) => ({ key: item.rewardKey })),
+    ...(activeKey ? [{ key: activeKey, isActive: true, reveal: Math.max(progress, 0.16) }] : [])
+  ];
+  const densityClass = residents.length >= 9 ? "aquarium-packed" : residents.length >= 4 ? "aquarium-crowded" : "";
   return `
-    <div class="tank-water">
+    <div class="tank-water ${densityClass}" data-resident-count="${residents.length}">
       <div class="water-surface"><i></i><i></i></div>
       <div class="light-rays"></div>
       <div class="bubble-field" aria-hidden="true">
@@ -505,33 +523,62 @@ function renderAquarium(activeReward, progress) {
       <div class="plant plant-one"><i></i><i></i><i></i></div>
       <div class="plant plant-two"><i></i><i></i><i></i></div>
       <div class="sand"><i></i><i></i><i></i></div>
-      ${renderAmbientFish()}
-      ${displayItems.map((item, index) => renderTankItem(item.rewardKey, index + 3, false)).join("")}
-      ${activeKey ? renderTankItem(activeKey, displayItems.length + 5, true, progress) : ""}
+      ${renderTankResidents(residents)}
     </div>
   `;
 }
 
-function renderAmbientFish() {
-  return [
-    { key: "goldfish", x: 15, y: 27, delay: -1.4, scale: 0.76 },
-    { key: "goldfish", x: 64, y: 45, delay: -5.2, scale: 0.58 },
-    { key: "koi", x: 36, y: 62, delay: -8.1, scale: 0.66 }
-  ].map((fish) => `
-    <div class="tank-item ambient-fish ${fish.key}" style="--x:${fish.x}%;--y:${fish.y}%;--delay:${fish.delay}s;--reveal:${fish.scale}">
-      ${renderCreature(fish.key)}
-    </div>
-  `).join("");
-}
+function renderTankResidents(residents) {
+  const groundCount = residents.filter((resident) => GROUND_REWARD_KEYS.has(resident.key)).length;
+  const swimmingCount = residents.length - groundCount;
+  const groundTravel = Math.max(0, Math.min(18, 30 - groundCount * 4));
+  const swimTravel = Math.max(4, Math.min(18, 24 - swimmingCount * 2));
+  let groundIndex = 0;
+  let swimmingIndex = 0;
 
-function renderTankItem(key, index, isActive, progress = 1) {
-  const groundItems = new Set(["helmet", "boot", "wheel", "ship-bottle", "hermit", "cherry-shrimp", "lobster"]);
-  const scuttlingItems = new Set(["hermit", "cherry-shrimp"]);
-  const x = scuttlingItems.has(key) ? 14 + ((index * 19) % 50) : 12 + ((index * 23) % 72);
-  const y = groundItems.has(key) ? 74 + (index % 3) * 3 : 20 + ((index * 17) % 48);
-  const delay = -((index * 1.37) % 8);
-  const floorLevel = scuttlingItems.has(key) ? `--floor-level:${(index % 3) * 4}px;` : "";
-  return `<div class="tank-item ${key} ${isActive ? "active-find" : ""}" ${isActive ? "data-active-find" : ""} style="--x:${x}%;--y:${y}%;--delay:${delay}s;--reveal:${Math.max(progress, 0.16)};${floorLevel}">${renderCreature(key)}</div>`;
+  return residents.map((resident, index) => {
+    const isGrounded = GROUND_REWARD_KEYS.has(resident.key);
+    let x;
+    let y;
+    let floorLevel = 0;
+
+    if (isGrounded) {
+      const groundStart = groundCount <= 3 ? 14 : 7;
+      const groundEnd = groundCount <= 3 ? 72 : 83;
+      x = groundCount === 1 ? 46 : groundStart + (groundIndex * (groundEnd - groundStart)) / (groundCount - 1);
+      floorLevel = (groundIndex % 2) * 3;
+      groundIndex += 1;
+    } else {
+      const slot = AQUARIUM_SWIM_SLOTS[swimmingIndex % AQUARIUM_SWIM_SLOTS.length];
+      x = slot.x;
+      y = slot.y;
+      swimmingIndex += 1;
+    }
+
+    const delay = resident.delay ?? -((index * 1.37) % 8);
+    const classes = [
+      "tank-item",
+      resident.key,
+      ANIMAL_REWARD_KEYS.has(resident.key) ? "tank-animal" : "tank-object",
+      resident.ambient ? "ambient-fish" : "",
+      resident.isActive ? "active-find" : ""
+    ].filter(Boolean).join(" ");
+    const style = [
+      `--x:${x}%`,
+      y == null ? "" : `--y:${y}%`,
+      `--delay:${delay}s`,
+      `--reveal:${resident.reveal ?? 1}`,
+      `--floor-level:${floorLevel}px`,
+      `--crawl-left:${-groundTravel}px`,
+      `--crawl-right:${groundTravel}px`,
+      `--swim-left:${-swimTravel}px`,
+      `--swim-right:${swimTravel}px`,
+      `--swim-rise:${-Math.max(4, Math.round(swimTravel * 0.4))}px`,
+      `--swim-dip:${Math.max(3, Math.round(swimTravel * 0.3))}px`
+    ].filter(Boolean).join(";");
+
+    return `<div class="${classes}" ${resident.isActive ? "data-active-find" : ""} style="${style}">${renderCreature(resident.key)}</div>`;
+  }).join("");
 }
 
 function renderCreature(key) {
